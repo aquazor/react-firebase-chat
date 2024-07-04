@@ -12,7 +12,10 @@ const SearchPanel = () => {
     <div className="flex items-center gap-3 px-5 py-5">
       <div className="flex flex-1 items-center gap-1 rounded-lg bg-slate-600 bg-opacity-50 p-1">
         <img src="/search.png" width={20} height={20} alt="Search" />
+
         <Input
+          id="searchChats"
+          name="searchChats"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Search..."

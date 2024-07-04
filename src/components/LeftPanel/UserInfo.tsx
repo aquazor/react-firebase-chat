@@ -1,5 +1,5 @@
 import { useUserStore } from '../../store/userStore';
-import { Avatar } from '../ui';
+import UploadAvatar from '../UploadAvatar';
 
 const UserInfo = () => {
   const { user } = useUserStore();
@@ -7,16 +7,16 @@ const UserInfo = () => {
   return (
     <div className="flex justify-between gap-2 p-5">
       <div className="flex items-center gap-5">
-        <Avatar src="/avatar.png" alt="Avatar" />
+        <UploadAvatar />
 
         <h2 className="text-xl font-bold">{user?.username}</h2>
       </div>
 
-      <div className="flex items-center gap-5 *:h-[20px] *:w-[20px]">
+      {/* <div className="flex items-center gap-5 *:h-[20px] *:w-[20px]">
         <img src="/more.png" alt="More" />
         <img src="/video.png" alt="Video" />
         <img src="/edit.png" alt="Edit" />
-      </div>
+      </div> */}
     </div>
   );
 };

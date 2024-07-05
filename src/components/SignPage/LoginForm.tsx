@@ -38,7 +38,7 @@ const LoginForm = ({ isSubmitting, setIsSubmitting }: FormProps) => {
   });
 
   const handleLogin: SubmitHandler<Inputs> = async ({ email, password }) => {
-    setIsSubmitting!(true);
+    setIsSubmitting(true);
 
     try {
       await loginUser({ email, password });
@@ -51,7 +51,7 @@ const LoginForm = ({ isSubmitting, setIsSubmitting }: FormProps) => {
 
       toast.error(message);
     } finally {
-      setIsSubmitting!(false);
+      setIsSubmitting(false);
     }
   };
 

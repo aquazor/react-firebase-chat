@@ -22,6 +22,7 @@ const Avatar = ({
 
   return (
     <img
+      style={{ width, height }}
       src={src}
       width={width}
       height={height}

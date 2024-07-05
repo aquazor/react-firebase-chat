@@ -2,14 +2,14 @@ import { create } from 'zustand';
 import { getDocument } from '../firebase/api';
 import { User } from '../firebase/types';
 
-type userState = {
+type UserState = {
   user: User | null;
   isLoading: boolean;
   setAvatar: (url: string) => void;
   fetchUserInfo: (uid: string | undefined) => Promise<void>;
 };
 
-export const useUserStore = create<userState>((set) => ({
+export const useUserStore = create<UserState>((set) => ({
   user: null,
   isLoading: true,
   setAvatar: (url) =>

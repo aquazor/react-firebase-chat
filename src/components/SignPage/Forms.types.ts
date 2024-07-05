@@ -1,4 +1,4 @@
 export type FormProps = {
-  isSubmitting?: boolean;
-  setIsSubmitting?: React.Dispatch<React.SetStateAction<boolean>>;
+  isSubmitting: boolean;
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
 };

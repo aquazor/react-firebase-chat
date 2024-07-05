@@ -48,11 +48,10 @@ const RegisterForm = ({ isSubmitting, setIsSubmitting }: FormProps) => {
     email,
     password,
   }) => {
-    setIsSubmitting!(true);
+    setIsSubmitting(true);
 
     try {
-      const { user } = await registerUser({ email, password });
-
+      const user = await registerUser({ email, password });
       await setUserDocuments({ id: user.uid, username, email, blocked: [] });
 
       toast.success('Account created! You can login now!');
@@ -65,7 +64,7 @@ const RegisterForm = ({ isSubmitting, setIsSubmitting }: FormProps) => {
 
       toast.error(message);
     } finally {
-      setIsSubmitting!(false);
+      setIsSubmitting(false);
     }
   };
 

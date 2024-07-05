@@ -1,19 +1,24 @@
+import { useChatsStore } from '../../store/chatsStore';
 import { Avatar } from '../ui';
 
 const ReceiverInfoPanel = () => {
+  const { user: receiver } = useChatsStore();
+
   return (
     <div className="flex items-center justify-between gap-5 p-5">
       <div className="flex items-center gap-5">
-        <Avatar src="/avatar.png" alt="Avatar" width={60} height={60} />
+        <Avatar
+          src={receiver?.avatar || '/avatar.png'}
+          width={60}
+          height={60}
+        />
 
         <div className="max-w-[15vw] sm:max-w-[20vw]">
           <h4 className="overflow-hidden text-ellipsis whitespace-nowrap text-xl font-semibold">
-            Alexandr Kornevskyi
+            {receiver?.username}
           </h4>
           <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-400">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. A
-            aspernatur, dolores blanditiis, solilique, provident veritatis
-            doloremque ipsam nesciunt autem praesentium nam?
+            {receiver?.status}
           </p>
         </div>
       </div>

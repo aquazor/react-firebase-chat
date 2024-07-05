@@ -1,9 +1,27 @@
 import { useState } from 'react';
+import { sendMessage } from '../../firebase/api';
 import { Input, Button } from '../ui';
+import { useChatsStore } from '../../store/chatsStore';
+import { useUserStore } from '../../store/userStore';
 import EmojiMenu from './EmojiMenu';
 
 const ChatControls = () => {
+  const { chatId, user: receiver } = useChatsStore();
+  const { user: sender } = useUserStore();
+
   const [value, setValue] = useState('');
+
+  const handleSendMessage = async () => {
+    if (value === '') {
+      return;
+    }
+    try {
+      await sendMessage(chatId!, sender!.id, receiver!.id, value);
+      setValue('');
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex items-center gap-3 px-5 py-3">
@@ -18,7 +36,8 @@ const ChatControls = () => {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           id="chat"
-          name="caht"
+          name="chat"
+          autoComplete="off"
           placeholder="Type a message..."
           className="w-full rounded-lg p-1"
         />
@@ -26,7 +45,12 @@ const ChatControls = () => {
 
       <EmojiMenu setValue={setValue} />
 
-      <Button className="rounded-lg bg-sky-700 px-3 py-2">Send</Button>
+      <Button
+        onClick={handleSendMessage}
+        className="rounded-lg bg-sky-700 px-3 py-2"
+      >
+        Send
+      </Button>
     </div>
   );
 };

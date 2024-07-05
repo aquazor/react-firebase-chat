@@ -16,7 +16,6 @@ const AddUserModal = ({ onClose }: { onClose: () => void }) => {
     try {
       const response = await searchUser(value);
       setUsers(response);
-      console.log(response);
     } catch (error) {
       console.log(error);
     }

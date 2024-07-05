@@ -25,9 +25,72 @@ import {
   StorageError,
 } from 'firebase/storage';
 import { FirebaseError } from 'firebase/app';
-import { CreateUserParams, User } from './types';
+import { CreateUserParams, User, UserChat } from './types';
 
-export const uploadAvatar = async (file: File, uid: string) => {
+export async function setUserDocuments(user: User) {
+  const { id, username, email, blocked } = user;
+
+  try {
+    await setDoc(doc(db, 'users', id), {
+      id,
+      username,
+      email,
+      blocked,
+    });
+    await setDoc(doc(db, 'userchats', id), { chats: [] });
+  } catch (error) {
+    console.error(error);
+    throw Error('Something went wrong.');
+  }
+}
+
+export async function loginUser({ email, password }: CreateUserParams) {
+  try {
+    const { user } = await signInWithEmailAndPassword(auth, email, password);
+
+    return user;
+  } catch (err) {
+    console.log(err);
+
+    const error = err as AuthError;
+    let errorMessage = 'Something went wrong.';
+
+    if (error?.code === AuthErrorCodes.EMAIL_EXISTS) {
+      errorMessage = 'User with this email already exists.';
+    }
+
+    if (error?.code === AuthErrorCodes.INVALID_LOGIN_CREDENTIALS) {
+      errorMessage = 'Wrong email or password.';
+    }
+
+    throw Error(errorMessage);
+  }
+}
+
+export async function registerUser({ email, password }: CreateUserParams) {
+  try {
+    const { user } = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
+
+    return user;
+  } catch (err) {
+    console.log(err);
+
+    const error = err as AuthError;
+    let errorMessage = 'Something went wrong.';
+
+    if (error?.code === AuthErrorCodes.EMAIL_EXISTS) {
+      errorMessage = 'User with this email already exists.';
+    }
+
+    throw Error(errorMessage);
+  }
+}
+
+export async function uploadAvatar(file: File, uid: string) {
   try {
     const storageRef = ref(
       storage,
@@ -78,68 +141,9 @@ export const uploadAvatar = async (file: File, uid: string) => {
 
     throw Error(message);
   }
-};
+}
 
-export const loginUser = async ({ email, password }: CreateUserParams) => {
-  try {
-    const response = await signInWithEmailAndPassword(auth, email, password);
-
-    return response;
-  } catch (err) {
-    console.log(err);
-
-    const error = err as AuthError;
-    let errorMessage = 'Something went wrong.';
-
-    if (error?.code === AuthErrorCodes.EMAIL_EXISTS) {
-      errorMessage = 'User with this email already exists.';
-    }
-
-    throw Error(errorMessage);
-  }
-};
-
-export const registerUser = async ({ email, password }: CreateUserParams) => {
-  try {
-    const response = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-
-    return response;
-  } catch (err) {
-    console.log(err);
-
-    const error = err as AuthError;
-    let errorMessage = 'Something went wrong.';
-
-    if (error?.code === AuthErrorCodes.EMAIL_EXISTS) {
-      errorMessage = 'User with this email already exists.';
-    }
-
-    throw Error(errorMessage);
-  }
-};
-
-export const setUserDocuments = async (user: User) => {
-  const { id, username, email, blocked } = user;
-
-  try {
-    await setDoc(doc(db, 'users', id), {
-      id,
-      username,
-      email,
-      blocked,
-    });
-    await setDoc(doc(db, 'userchats', id), { chats: [] });
-  } catch (error) {
-    console.error(error);
-    throw Error('Something went wrong.');
-  }
-};
-
-export const getDocument = async (collectionName: string, uid: string) => {
+export async function getDocument(collectionName: string, uid: string) {
   try {
     const docRef = doc(db, collectionName, uid);
     const docSnap = await getDoc(docRef);
@@ -158,9 +162,9 @@ export const getDocument = async (collectionName: string, uid: string) => {
 
     throw error;
   }
-};
+}
 
-export const searchUser = async (userName: string) => {
+export async function searchUser(userName: string) {
   try {
     const userRef = collection(db, 'users');
     const q = query(userRef, where('username', '==', userName));
@@ -180,9 +184,9 @@ export const searchUser = async (userName: string) => {
 
     throw error;
   }
-};
+}
 
-export const addChat = async (currentUser: User, addedUser: User) => {
+export async function addChat(currentUser: User, addedUser: User) {
   try {
     const chatRef = collection(db, 'chats');
     const userChatsRef = collection(db, 'userchats');
@@ -220,4 +224,40 @@ export const addChat = async (currentUser: User, addedUser: User) => {
 
     throw error;
   }
-};
+}
+
+export async function sendMessage(
+  chatId: string,
+  senderId: string,
+  receiverId: string,
+  text: string,
+) {
+  try {
+    await updateDoc(doc(db, 'chats', chatId), {
+      messages: arrayUnion({ senderId, text, createdAt: new Date() }),
+    });
+
+    const userIds = [senderId, receiverId];
+
+    userIds.forEach(async (id) => {
+      const userChatsRef = doc(db, 'userchats', id);
+      const userChatsSnapshot = await getDoc(userChatsRef);
+
+      if (userChatsSnapshot.exists()) {
+        const chats = userChatsSnapshot.data().chats as UserChat[];
+
+        const chatIndex = chats?.findIndex(
+          (chat: UserChat) => chat.chatId === chatId,
+        );
+
+        chats[chatIndex].lastMessage = text;
+        chats[chatIndex].isSeen = id === senderId ? true : false;
+        chats[chatIndex].updatedAt = Date.now();
+
+        await updateDoc(userChatsRef, { chats });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}

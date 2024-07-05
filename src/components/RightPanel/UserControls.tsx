@@ -9,7 +9,7 @@ const UserControls = () => {
       </Button>
 
       <Button
-        onClick={auth.signOut}
+        onClick={() => auth.signOut()}
         className="w-full rounded-lg bg-slate-700 p-2 uppercase transition-colors hover:bg-slate-600"
       >
         Logout

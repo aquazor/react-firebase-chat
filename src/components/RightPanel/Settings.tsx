@@ -1,5 +1,4 @@
 import { Dropdown } from '../ui';
-import UserControls from './UserControls';
 
 const Settings = () => {
   return (
@@ -35,8 +34,6 @@ const Settings = () => {
           </div>
         </Dropdown>
       </div>
-
-      <UserControls />
     </div>
   );
 };

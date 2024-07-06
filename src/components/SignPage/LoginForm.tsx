@@ -33,7 +33,7 @@ const LoginForm = ({ isSubmitting, setIsSubmitting }: FormProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>({
-    mode: 'onBlur',
+    mode: 'onSubmit',
     resolver: zodResolver(schema),
   });
 
@@ -42,6 +42,8 @@ const LoginForm = ({ isSubmitting, setIsSubmitting }: FormProps) => {
 
     try {
       await loginUser({ email, password });
+
+      toast.success('Successfully logged in!');
     } catch (error) {
       let message = 'Something went wrong.';
 

@@ -1,4 +1,5 @@
 import { useUserStore } from '../../store/userStore';
+import { truncate } from '../../utils/truncate';
 import UploadAvatar from '../UploadAvatar';
 
 const UserInfo = () => {
@@ -9,7 +10,7 @@ const UserInfo = () => {
       <div className="flex items-center gap-5">
         <UploadAvatar />
 
-        <h2 className="text-xl font-bold">{user?.username}</h2>
+        <h2 className="text-xl font-bold">{truncate(user?.username, 15)}</h2>
       </div>
 
       {/* <div className="flex items-center gap-5 *:h-[20px] *:w-[20px]">

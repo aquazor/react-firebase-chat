@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { useEffect } from 'react';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { getDocument } from '../../firebase/api';
 import { UserChat } from '../../firebase/types';
@@ -8,14 +8,12 @@ import { useChatsStore } from '../../store/chatsStore';
 import { Avatar } from '../ui';
 
 const ChatList = () => {
-  const { user } = useUserStore();
-  const { changeChat } = useChatsStore();
-
-  const [chats, setChats] = useState<UserChat[] | null>(null);
+  const { user: sender } = useUserStore();
+  const { chats, setChats, changeChat, chatId } = useChatsStore();
 
   useEffect(() => {
     const unSub = onSnapshot(
-      doc(db, 'userchats', user?.id || ''),
+      doc(db, 'userchats', sender?.id || ''),
       async (res) => {
         if (!res.exists()) {
           return;
@@ -38,10 +36,40 @@ const ChatList = () => {
     );
 
     return () => unSub();
-  }, [user?.id]);
+  }, [sender?.id, setChats]);
 
   const handleChatSelect = async (chat: UserChat) => {
-    changeChat(chat.chatId, chat.user!);
+    if (chatId === chat.chatId) {
+      return;
+    }
+
+    const userChats = chats?.map((item) => {
+      const { user: _, ...rest } = item;
+
+      return rest;
+    });
+
+    const chatIndex = userChats?.findIndex(
+      (item) => item.chatId === chat.chatId,
+    );
+
+    if (userChats === undefined || chatIndex === undefined) {
+      return;
+    }
+
+    userChats[chatIndex].isSeen = true;
+
+    const userChatsRef = doc(db, 'userchats', sender!.id);
+
+    try {
+      await updateDoc(userChatsRef, {
+        chats: userChats,
+      });
+
+      changeChat(chat.chatId, chat.user!);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -56,8 +84,11 @@ const ChatList = () => {
             <div
               key={chat.chatId}
               onClick={() => handleChatSelect(chat)}
-              className="flex cursor-pointer items-center gap-2 border-b border-slate-600 py-2 md:gap-5"
+              className={`relative flex cursor-pointer items-center gap-2 border-b ${!chat.isSeen ? 'border-sky-400' : 'border-slate-600'} py-2 md:gap-5`}
             >
+              {!chat.isSeen && (
+                <div className="absolute right-0 top-[10px] h-[12px] w-[12px] rounded-full bg-sky-400"></div>
+              )}
               <Avatar src={chat.user?.avatar || '/avatar.png'} alt="Avatar" />
 
               <div className="max-w-[16vw]">

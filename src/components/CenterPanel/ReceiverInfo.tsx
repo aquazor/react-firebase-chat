@@ -1,5 +1,4 @@
 import { useChatsStore } from '../../store/chatsStore';
-import { Avatar } from '../ui';
 
 const ReceiverInfoPanel = () => {
   const { user: receiver } = useChatsStore();
@@ -7,12 +6,6 @@ const ReceiverInfoPanel = () => {
   return (
     <div className="flex items-center justify-between gap-5 p-5">
       <div className="flex items-center gap-5">
-        <Avatar
-          src={receiver?.avatar || '/avatar.png'}
-          width={60}
-          height={60}
-        />
-
         <div className="max-w-[15vw] sm:max-w-[20vw]">
           <h4 className="overflow-hidden text-ellipsis whitespace-nowrap text-xl font-semibold">
             {receiver?.username}

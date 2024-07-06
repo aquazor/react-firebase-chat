@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { getDocument } from '../firebase/api';
-import { User } from '../firebase/types';
+import { StateUser } from './types';
 
 type UserState = {
-  user: User | null;
+  user: StateUser;
   isLoading: boolean;
   setAvatar: (url: string) => void;
   fetchUserInfo: (uid: string | undefined) => Promise<void>;

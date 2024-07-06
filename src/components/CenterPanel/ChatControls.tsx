@@ -12,9 +12,10 @@ const ChatControls = () => {
   const [value, setValue] = useState('');
 
   const handleSendMessage = async () => {
-    if (value === '') {
+    if (value.trim() === '') {
       return;
     }
+
     try {
       await sendMessage(chatId!, sender!.id, receiver!.id, value);
       setValue('');
@@ -33,6 +34,11 @@ const ChatControls = () => {
 
       <div className="flex flex-1 items-center gap-1 rounded-lg bg-slate-600 bg-opacity-50 p-1">
         <Input
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSendMessage();
+            }
+          }}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           id="chat"

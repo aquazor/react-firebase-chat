@@ -26,6 +26,7 @@ import {
 } from 'firebase/storage';
 import { FirebaseError } from 'firebase/app';
 import { CreateUserParams, User, UserChat } from './types';
+import { StateUser } from '../store/types';
 
 export async function setUserDocuments(user: User) {
   const { id, username, email, blocked } = user;
@@ -164,7 +165,7 @@ export async function getDocument(collectionName: string, uid: string) {
   }
 }
 
-export async function searchUser(userName: string) {
+export async function searchUsers(userName: string) {
   try {
     const userRef = collection(db, 'users');
     const q = query(userRef, where('username', '==', userName));
@@ -186,7 +187,11 @@ export async function searchUser(userName: string) {
   }
 }
 
-export async function addChat(currentUser: User, addedUser: User) {
+export async function addChat(currentUser: StateUser, addedUser: User) {
+  if (!currentUser || !addedUser) {
+    return;
+  }
+
   try {
     const chatRef = collection(db, 'chats');
     const userChatsRef = collection(db, 'userchats');

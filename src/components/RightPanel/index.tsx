@@ -1,5 +1,6 @@
 import { useChatsStore } from '../../store/chatsStore';
 import Settings from './Settings';
+import UserControls from './UserControls';
 import UserInfo from './UserInfo';
 
 const RightPanel = () => {
@@ -17,6 +18,8 @@ const RightPanel = () => {
           <Settings />
         </>
       )}
+
+      <UserControls />
     </div>
   );
 };

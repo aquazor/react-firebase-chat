@@ -39,7 +39,7 @@ const RegisterForm = ({ isSubmitting, setIsSubmitting }: FormProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>({
-    mode: 'onBlur',
+    mode: 'onSubmit',
     resolver: zodResolver(schema),
   });
 
@@ -54,7 +54,7 @@ const RegisterForm = ({ isSubmitting, setIsSubmitting }: FormProps) => {
       const user = await registerUser({ email, password });
       await setUserDocuments({ id: user.uid, username, email, blocked: [] });
 
-      toast.success('Account created! You can login now!');
+      toast.success('Account created successfully!');
     } catch (error) {
       let message = 'Something went wrong.';
 

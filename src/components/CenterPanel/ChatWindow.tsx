@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { Chat } from '../../firebase/types';
 import { useChatsStore } from '../../store/chatsStore';
@@ -9,7 +9,7 @@ import { Avatar } from '../ui';
 
 const ChatWindow = () => {
   const { user: sender } = useUserStore();
-  const { chatId, user: receiver } = useChatsStore();
+  const { user: receiver, chatId, chats, changeChat } = useChatsStore();
 
   const [chat, setChat] = useState<Chat>();
 
@@ -22,6 +22,38 @@ const ChatWindow = () => {
 
     return () => clearTimeout(timeout);
   }, [chatId]);
+
+  useEffect(() => {
+    const userChats = chats?.map((item) => {
+      const { user: _, ...rest } = item;
+
+      return rest;
+    });
+
+    const chatIndex = userChats?.findIndex((item) => item.chatId === chatId);
+
+    if (userChats === undefined || chatIndex === undefined) {
+      return;
+    }
+
+    userChats[chatIndex].isSeen = true;
+
+    const updateChats = async () => {
+      const userChatsRef = doc(db, 'userchats', sender!.id);
+
+      try {
+        await updateDoc(userChatsRef, {
+          chats: userChats,
+        });
+
+        changeChat(chatId, receiver);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    updateChats();
+  }, [changeChat, chatId, chats, receiver, sender]);
 
   useEffect(() => {
     if (!chatId) {

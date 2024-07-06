@@ -1,25 +1,35 @@
 import { create } from 'zustand';
-import { User } from '../firebase/types';
+import { UserChat } from '../firebase/types';
 import { useUserStore } from './userStore';
+import { StateChatId, StateUser } from './types';
 
 type ChatsState = {
-  user: User | null;
-  chatId: string | null;
+  user: StateUser;
+  chats: UserChat[] | null;
+  chatId: StateChatId;
   isLoading: boolean;
   isCurrentUserBlocked: boolean;
   isReceiverBlocked: boolean;
-  changeChat: (chatId: string, user: User) => void;
+
+  setChats: (chats: UserChat[]) => void;
+  changeChat: (chatId: StateChatId, user: StateUser) => void;
   changeBlock: () => void;
 };
 
 export const useChatsStore = create<ChatsState>((set) => ({
-  chatId: null,
   user: null,
+  chats: null,
+  chatId: null,
   isLoading: true,
   isCurrentUserBlocked: false,
   isReceiverBlocked: false,
 
+  setChats: (chats) => set((state) => ({ ...state, chats })),
   changeChat: (chatId, user) => {
+    if (chatId === null || user === null) {
+      return;
+    }
+
     const currentUser = useUserStore.getState().user;
 
     if (!currentUser) {
@@ -51,7 +61,6 @@ export const useChatsStore = create<ChatsState>((set) => ({
       isReceiverBlocked: false,
     });
   },
-
   changeBlock: () => {
     set((state) => ({ ...state, isReceiverBlocked: !state.isReceiverBlocked }));
   },

@@ -44,7 +44,7 @@ const UploadAvatar = () => {
   };
 
   return (
-    <div>
+    <div className="flex-shrink-0">
       <label
         className="flex cursor-pointer items-center justify-center"
         htmlFor="uploadAvatar"

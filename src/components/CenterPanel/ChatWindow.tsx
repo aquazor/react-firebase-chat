@@ -9,7 +9,7 @@ import { Avatar } from '../ui';
 
 const ChatWindow = () => {
   const { user: sender } = useUserStore();
-  const { user: receiver, chatId, chats, changeChat } = useChatsStore();
+  const { user: receiver, chatId, chats, changeChat, img } = useChatsStore();
 
   const [chat, setChat] = useState<Chat>();
 
@@ -18,7 +18,7 @@ const ChatWindow = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 200);
+    }, 500);
 
     return () => clearTimeout(timeout);
   }, [chatId]);
@@ -89,7 +89,9 @@ const ChatWindow = () => {
                 />
               </div>
 
-              <div className="flex flex-col items-start">
+              <div
+                className={`flex flex-col ${isMessageFromSender ? 'items-end' : 'items-start'}`}
+              >
                 {message?.img && (
                   <div className="mb-1">
                     <img
@@ -104,7 +106,9 @@ const ChatWindow = () => {
                 >
                   {message?.text}
                 </p>
-                <span className="inline-block w-full pr-1 text-end text-xs text-slate-400">
+                <span
+                  className={`inline-block w-full ${isMessageFromSender ? 'pr-1 text-end' : 'pl-1 text-start'} text-xs text-slate-400`}
+                >
                   {convertSecondsToTimeString(message?.createdAt.seconds)}
                 </span>
               </div>
@@ -112,6 +116,12 @@ const ChatWindow = () => {
           </div>
         );
       })}
+
+      {img?.url !== '' && (
+        <div className="flex max-w-[70%] self-end">
+          <img src={img.url || ''} alt="Image" />
+        </div>
+      )}
 
       <div ref={bottomRef}></div>
     </div>

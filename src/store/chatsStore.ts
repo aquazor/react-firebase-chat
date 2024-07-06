@@ -2,18 +2,21 @@ import { create } from 'zustand';
 import { UserChat } from '../firebase/types';
 import { useUserStore } from './userStore';
 import { StateChatId, StateUser } from './types';
+import { UploadImg } from './types';
 
 type ChatsState = {
   user: StateUser;
   chats: UserChat[] | null;
   chatId: StateChatId;
   isLoading: boolean;
+  img: UploadImg;
   isCurrentUserBlocked: boolean;
   isReceiverBlocked: boolean;
 
   setChats: (chats: UserChat[]) => void;
   changeChat: (chatId: StateChatId, user: StateUser) => void;
   changeBlock: () => void;
+  setImg: (img: UploadImg) => void;
 };
 
 export const useChatsStore = create<ChatsState>((set) => ({
@@ -21,6 +24,7 @@ export const useChatsStore = create<ChatsState>((set) => ({
   chats: null,
   chatId: null,
   isLoading: true,
+  img: { file: null, url: '' },
   isCurrentUserBlocked: false,
   isReceiverBlocked: false,
 
@@ -61,7 +65,7 @@ export const useChatsStore = create<ChatsState>((set) => ({
       isReceiverBlocked: false,
     });
   },
-  changeBlock: () => {
-    set((state) => ({ ...state, isReceiverBlocked: !state.isReceiverBlocked }));
-  },
+  changeBlock: () =>
+    set((state) => ({ ...state, isReceiverBlocked: !state.isReceiverBlocked })),
+  setImg: (img) => set((state) => ({ ...state, img })),
 }));

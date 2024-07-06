@@ -1,18 +1,14 @@
 import { useState } from 'react';
-import { Avatar } from '../ui';
+import { toast } from 'react-toastify';
 import { uploadAvatar } from '../../firebase/api';
 import { useUserStore } from '../../store/userStore';
-import { toast } from 'react-toastify';
-
-type Avatar = {
-  file: File | null;
-  url: string | undefined;
-};
+import { UploadImg } from '../../types';
+import { Avatar } from '../ui';
 
 const UploadAvatar = () => {
   const { user, setAvatar } = useUserStore();
 
-  const [uploadedAvatar, setUploadedAvatar] = useState<Avatar>({
+  const [uploadedAvatar, setUploadedAvatar] = useState<UploadImg>({
     file: null,
     url: user?.avatar,
   });

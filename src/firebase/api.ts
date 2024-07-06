@@ -91,43 +91,49 @@ export async function registerUser({ email, password }: CreateUserParams) {
   }
 }
 
+export async function uploadImg(file: File) {
+  const storageRef = ref(
+    storage,
+    `images/${new Date().toISOString()}_${file.name}`,
+  );
+  const uploadTask = uploadBytesResumable(storageRef, file);
+
+  const avatarUrl = await new Promise<string>((resolve, reject) => {
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      },
+      (error) => {
+        console.log('Upload failed:', error);
+        reject(`Something went wrong. Error code: ${error.code}`);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(downloadURL);
+        } catch (error) {
+          console.log(error);
+          let message = 'Something went wrong.';
+
+          if (error instanceof StorageError) {
+            message += `Error code: ${error.code}`;
+          }
+
+          reject(message);
+        }
+      },
+    );
+  });
+
+  return avatarUrl;
+}
+
 export async function uploadAvatar(file: File, uid: string) {
   try {
-    const storageRef = ref(
-      storage,
-      `images/${new Date().toISOString()}_${file.name}`,
-    );
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    const avatarUrl = await new Promise<string>((resolve, reject) => {
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log(`Upload is ${progress}% done`);
-        },
-        (error) => {
-          console.log('Upload failed:', error);
-          reject(`Something went wrong. Error code: ${error.code}`);
-        },
-        async () => {
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            resolve(downloadURL);
-          } catch (error) {
-            console.log(error);
-            let message = 'Something went wrong.';
-
-            if (error instanceof StorageError) {
-              message += `Error code: ${error.code}`;
-            }
-
-            reject(message);
-          }
-        },
-      );
-    });
+    const avatarUrl = await uploadImg(file);
 
     await setDoc(doc(db, 'users', uid), { avatar: avatarUrl }, { merge: true });
 
@@ -236,10 +242,16 @@ export async function sendMessage(
   senderId: string,
   receiverId: string,
   text: string,
+  imgUrl?: string | null,
 ) {
   try {
     await updateDoc(doc(db, 'chats', chatId), {
-      messages: arrayUnion({ senderId, text, createdAt: new Date() }),
+      messages: arrayUnion({
+        senderId,
+        text,
+        createdAt: new Date(),
+        ...(imgUrl && { img: imgUrl }),
+      }),
     });
 
     const userIds = [senderId, receiverId];

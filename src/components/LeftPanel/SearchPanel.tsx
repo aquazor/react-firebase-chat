@@ -19,8 +19,8 @@ const SearchPanel = () => {
           alt="Search"
         />
         <Input
-          id="searchUsers"
-          name="searchUsers"
+          id="searchUserChats"
+          name="searchUserChats"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Search..."

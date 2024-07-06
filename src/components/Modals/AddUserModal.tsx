@@ -94,8 +94,8 @@ const AddUserModal = ({ onClose }: { onClose: () => void }) => {
               alt="Search"
             />
             <Input
-              id="searchUsers"
-              name="searchUsers"
+              id="searchNewUsers"
+              name="searchNewUsers"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder="Search..."
